@@ -1,0 +1,41 @@
+# Import necessary packages
+import pandas as pd
+import numpy as np
+
+# Begin coding here ...
+# Use as many cells as you like
+
+# Import CSV for prices
+airbnb_price = pd.read_csv('data/airbnb_price.csv')
+
+# Import Excel file for room types
+airbnb_room_type = pd.read_excel('data/airbnb_room_type.xlsx')
+
+# Import TSV for review dates
+airbnb_last_review = pd.read_csv('data/airbnb_last_review.tsv', sep='\t')
+
+# Join the three data frames together into one
+merged_data = pd.merge(airbnb_price, airbnb_room_type, on='listing_id')
+merged_data = pd.merge(merged_data, airbnb_last_review, on='listing_id')
+
+# 3. Determining the earliest and most recent review dates
+merged_data['last_review'] = pd.to_datetime(merged_data['last_review'])
+earliest_review_date = merged_data['last_review'].min()
+latest_review_date = merged_data['last_review'].max()
+
+# 4. Finding how many listings are private rooms
+num_private_rooms = (merged_data['room_type'].str.lower() == 'private room').sum()
+
+# 5. Finding the average listing price
+merged_data['price'] = merged_data['price'].str.replace(' dollars', '').astype(float)
+avg_price = merged_data['price'].mean()
+
+# 6. Creating a DataFrame with the four solution values
+review_dates = pd.DataFrame({
+    'first_reviewed': [earliest_review_date],
+    'last_reviewed': [latest_review_date],
+    'nb_private_rooms': [num_private_rooms],
+    'avg_price': [round(avg_price, 2)]
+})
+
+review_dates
